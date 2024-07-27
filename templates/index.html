@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Python Online Compiler - Run Python code directly in your browser with auto-indentation and syntax highlighting. Ideal for learning and testing Python code.">
+    <meta name="description" content="Python Online Compiler - Run Python code directly in your browser with auto-indentation and syntax highlighting. Ideal for learning and testing Python code.">
+    <meta name="keywords" content="Python online compiler, Python interpreter, Python code editor, run Python code online, Python IDE">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e9ecef;
+            transition: background-color 0.3s;
+        }
+        .editor-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 3000px;
+            height: 90%;
+            max-height: 2500px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s;
+        }
+        .editor-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+            transition: background-color 0.3s, border-bottom 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+        .editor-header .title {
+            font-weight: bold;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .editor-header .button-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .editor-header button {
+            margin: 0 10px;
+            border-radius: 5px;
+        }
+        .editor-content {
+            display: flex;
+            flex: 1;
+            height: calc(100% - 50px);
+        }
+        .text-editor-container {
+            display: flex;
+            flex: 2;
+            height: 100%;
+        }
+        .line-numbers {
+            padding: 15px;
+            background-color: #3d3939;
+            color: #f0f0f0;
+            border-right: 1px solid #dee2e6;
+            box-sizing: border-box;
+            text-align: right;
+            font-family: monospace;
+            font-size: 20px;
+            overflow-y: auto;
+            height: 100%;
+            border-radius: 10px 0 0 10px;
+        }
+        .text-editor {
+            flex: 1;
+            padding: 15px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 20px;
+            border: none;
+            border-radius: 0 10px 10px 0;
+            color: #212529;
+            background-color: #ffffff;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .text-editor:focus {
+            outline: none;
+            box-shadow: inset 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        .output-container {
+            flex: 1;
+            border-left: 1px solid #dee2e6;
+            padding: 15px;
+            background-color: #f8f9fa;
+            overflow-y: auto;
+            font-size: 20px;
+            color: #212529;
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 0 10px 10px 0;
+        }
+        .run-button, .download-button, .toggle-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .run-button {
+            background-color: #007bff;
+            color: white;
+        }
+        .run-button:hover {
+            background-color: #0056b3;
+        }
+        .download-button {
+            background-color: #28a745;
+            color: white;
+        }
+        .download-button:hover {
+            background-color: #218838;
+        }
+        .toggle-button {
+            background-color: #e9ecef;
+            color: #343a40;
+            border: 1px solid #dee2e6;
+        }
+        .toggle-button:hover {
+            background-color: #dee2e6;
+        }
+        .dark-mode {
+            background-color: #343a40;
+            color: #f8f9fa;
+        }
+        .dark-mode .text-editor {
+            background-color: #212529;
+            color: #f8f9fa;
+        }
+        .dark-mode .output-container {
+            background-color: #212529;
+            color: #f8f9fa;
+        }
+        .dark-mode .editor-header {
+            background-color: #495057;
+            border-bottom: 1px solid #6c757d;
+        }
+        .dark-mode .run-button {
+            background-color: #0069d9;
+        }
+        .dark-mode .run-button:hover {
+            background-color: #0056b3;
+        }
+        .dark-mode .toggle-button {
+            background-color: #495057;
+            color: #f8f9fa;
+            border: 1px solid #6c757d;
+        }
+        .dark-mode .toggle-button:hover {
+            background-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="editor-container">
+        <div class="editor-header">
+            <div class="title">Python Online Compiler</div>
+            <div class="button-group">
+                <button class="run-button" onclick="runCode()">
+                    <i class="fas fa-play"></i> Run
+                </button>
+                <form id="download-form" method="POST" action="/download">
+                    <input type="hidden" name="code" id="code-input">
+                    <button type="submit" class="download-button" onclick="updateCodeInput()">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </form>
+                <button class="btn toggle-button ml-2" onclick="toggleMode()">
+                    <i class="fas fa-adjust"></i>
+                </button>
+            </div>
+        </div>
+        <div class="editor-content">
+            <div class="text-editor-container">
+                <div class="line-numbers" id="line-numbers"></div>
+                <textarea class="text-editor" id="text-editor" placeholder="Write your Python code here...">
+# Online Python compiler (interpreter) to run Python online.
+# Write Python 3 code in this online editor and run it.
+print("Helloworld!")
+                </textarea>
+            </div>
+            <div class="output-container" id="output"></div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const textEditor = document.getElementById('text-editor');
+        const output = document.getElementById('output');
+        const lineNumbers = document.getElementById('line-numbers');
+        let isDarkMode = false;
+
+        function runCode() {
+            const code = textEditor.value;
+            fetch('/run', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ 'code': code })
+            })
+            .then(response => response.json())
+            .then(data => {
+                output.textContent = data.output;
+            })
+            .catch(error => {
+                output.textContent = 'Error: ' + error.message;
+            });
+        }
+
+        function updateCodeInput() {
+            document.getElementById('code-input').value = textEditor.value;
+        }
+
+        function toggleMode() {
+            const body = document.body;
+            const editorContainer = document.querySelector('.editor-container');
+            const outputContainer = document.querySelector('.output-container');
+            isDarkMode = !isDarkMode;
+            if (isDarkMode) {
+                body.classList.add('dark-mode');
+                editorContainer.classList.add('dark-mode');
+                outputContainer.classList.add('dark-mode');
+            } else {
+                body.classList.remove('dark-mode');
+                editorContainer.classList.remove('dark-mode');
+                outputContainer.classList.remove('dark-mode');
+            }
+        }
+
+        function updateLineNumbers() {
+            const lines = textEditor.value.split('\n').length;
+            lineNumbers.innerHTML = Array.from({ length: lines }, (_, i) => i + 1).join('<br>');
+        }
+
+        function handleTab(event) {
+            if (event.key === 'Tab') {
+                event.preventDefault();
+                const start = textEditor.selectionStart;
+                const end = textEditor.selectionEnd;
+                textEditor.value = textEditor.value.substring(0, start) + '    ' + textEditor.value.substring(end);
+                textEditor.selectionStart = textEditor.selectionEnd = start + 4;
+                updateLineNumbers();
+            }
+        }
+
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const start = textEditor.selectionStart;
+                const end = textEditor.selectionEnd;
+                const before = textEditor.value.substring(0, start);
+                const after = textEditor.value.substring(end);
+                const lastLine = before.split('\n').pop();
+                const indent = lastLine.match(/^\s*/)[0];
+                textEditor.value = before + '\n' + (lastLine.endsWith(':') ? indent + '    ' : indent) + after;
+                textEditor.selectionStart = textEditor.selectionEnd = start + (lastLine.endsWith(':') ? indent.length + 4 : indent.length + 1);
+                updateLineNumbers();
+            }
+        }
+
+        textEditor.addEventListener('input', updateLineNumbers);
+        textEditor.addEventListener('keydown', handleTab);
+        textEditor.addEventListener('keydown', handleEnter);
+        textEditor.addEventListener('scroll', () => {
+            lineNumbers.style.top = -textEditor.scrollTop + 'px';
+        });
+
+        updateLineNumbers();
+    </script>
+</body>
+</html>
