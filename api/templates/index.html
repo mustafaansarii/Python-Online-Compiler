@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Python Online Compiler - Run Python code directly in your browser with auto-indentation and syntax highlighting. Ideal for learning and testing Python code.">
-    <meta name="description" content="Python Online Compiler - Run Python code directly in your browser with auto-indentation and syntax highlighting. Ideal for learning and testing Python code.">
-    <meta name="keywords" content="Python online compiler, Python interpreter, Python code editor, run Python code online, Python IDE">
+    <title>Python Text Editor</title>
+    <!-- Favicon -->
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/172px-Python-logo-notext.svg.png" type="image/x-icon">
+    
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -25,9 +25,9 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            max-width: 3000px;
+            max-width: 2500px;
             height: 90%;
-            max-height: 2500px;
+            max-height: 90%;
             background: #ffffff;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -35,21 +35,22 @@
             overflow: hidden;
             transition: background-color 0.3s;
         }
+        .editor-title {
+            font-weight: bold;
+            font-size: 24px;
+            margin: 20px 0;
+            text-align: center;
+        }
         .editor-header {
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
             padding: 10px;
             border-bottom: 1px solid #dee2e6;
             background-color: #f8f9fa;
             transition: background-color 0.3s, border-bottom 0.3s;
-            position: relative;
-            z-index: 1;
-        }
-        .editor-header .title {
-            font-weight: bold;
-            font-size: 24px;
-            margin-bottom: 10px;
+            height: 50px;
+            border-radius: 8px;
         }
         .editor-header .button-group {
             display: flex;
@@ -63,7 +64,7 @@
         .editor-content {
             display: flex;
             flex: 1;
-            height: calc(100% - 50px);
+            height: calc(100% - 70px);
         }
         .text-editor-container {
             display: flex;
@@ -78,7 +79,7 @@
             box-sizing: border-box;
             text-align: right;
             font-family: monospace;
-            font-size: 20px;
+            font-size: 16px;
             overflow-y: auto;
             height: 100%;
             border-radius: 10px 0 0 10px;
@@ -89,7 +90,7 @@
             box-sizing: border-box;
             overflow-y: auto;
             font-family: monospace;
-            font-size: 20px;
+            font-size: 16px;
             border: none;
             border-radius: 0 10px 10px 0;
             color: #212529;
@@ -106,10 +107,11 @@
             padding: 15px;
             background-color: #f8f9fa;
             overflow-y: auto;
-            font-size: 20px;
+            font-size: 16px;
             color: #212529;
             transition: background-color 0.3s, color 0.3s;
             border-radius: 0 10px 10px 0;
+            white-space: pre-wrap; /* Preserve white space and line breaks */
         }
         .run-button, .download-button, .toggle-button {
             padding: 10px 20px;
@@ -175,8 +177,8 @@
 </head>
 <body>
     <div class="editor-container">
+        <div class="editor-title">Python Online Compiler</div>
         <div class="editor-header">
-            <div class="title">Python Online Compiler</div>
             <div class="button-group">
                 <button class="run-button" onclick="runCode()">
                     <i class="fas fa-play"></i> Run

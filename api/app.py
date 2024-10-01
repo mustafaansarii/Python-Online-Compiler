@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, send_file, jsonify
 import subprocess
 import os
+import tempfile
 
 app = Flask(__name__)
 
@@ -11,9 +12,9 @@ def index():
 @app.route('/run', methods=['POST'])
 def run_code():
     code = request.form.get('code')
-    file_path = 'temp_code.py'
-    with open(file_path, 'w') as file:
-        file.write(code)
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.py') as temp_file:
+        file_path = temp_file.name
+        temp_file.write(code.encode('utf-8'))
     
     try:
         result = subprocess.run(['python', file_path], capture_output=True, text=True, timeout=10)
@@ -30,10 +31,10 @@ def run_code():
 @app.route('/download', methods=['POST'])
 def download():
     code = request.form.get('code')
-    file_path = 'app.py'
-    with open(file_path, 'w') as file:
-        file.write(code)
-    return send_file(file_path, as_attachment=True)
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.py') as temp_file:
+        file_path = temp_file.name
+        temp_file.write(code.encode('utf-8'))
+    return send_file(file_path, as_attachment=True, download_name='main.py')
 
 if __name__ == '__main__':
     app.run(debug=True)
